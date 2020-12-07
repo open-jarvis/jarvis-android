@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.jarvis.Jarvis;
 import com.example.jarvis.R;
 
 import org.json.JSONException;
@@ -19,38 +20,21 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public class Actions {
-    public static View.OnClickListener onConnectButtonPressed(EditText ipOrHostname, EditText tokenInput, TextView connectionState) {
+    public static View.OnClickListener onConnectButtonPressed(EditText ipOrHostname, EditText tokenInput, TextView connectionState, EditText preSharedKeyInput) {
         return v -> {
-            Thread t = new Thread(() -> {
-                Utils.hideKeyboard();
+            Utils.hideKeyboard();
 
-                String host = String.valueOf(ipOrHostname.getText());
-                String token = String.valueOf(tokenInput.getText());
+            String host = String.valueOf(ipOrHostname.getText());
+            String preSharedKey = String.valueOf(preSharedKeyInput.getText());
+            String token = String.valueOf(tokenInput.getText());
 
-                String result = null;
-                try {
-                    result = HTTP.get("http://" + host + ":1884/register-device?token=" + token + "&type=mobile&is_app=true&name=Android Mobile");
-                } catch (IOException e) {
-                    Log.e("Jarvis", "[HTTP GET] " + "http://" + host + ":1884/register-device?token=" + token + " - " + Log.getStackTraceString(e));
-                    e.printStackTrace();
-                    return;
-                }
+            Jarvis.connectTo(host, preSharedKey, token);
+        };
+    }
 
-                try {
-                    JSONObject res = new JSONObject(result);
-                    if (res.getBoolean("success")) {
-                        // We're registered
-
-                        connectionState.setText("Connected to Jarvis at " + host);
-                        connectionState.setTextColor(0xFF1DC558); // R.color.green
-                    }
-                } catch (JSONException e) {
-                    Log.e("Jarvis", "[HTTP JSON] " + "http://" + host + ":1884/register-device?token=" + token + " - " + Log.getStackTraceString(e));
-                    e.printStackTrace();
-                    return;
-                }
-            });
-            t.start();
+    public static View.OnClickListener onReconnectButtonPressed() {
+        return v -> {
+            Jarvis.reconnect();
         };
     }
 }

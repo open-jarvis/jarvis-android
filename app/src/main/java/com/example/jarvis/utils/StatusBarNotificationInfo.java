@@ -39,17 +39,25 @@ public class StatusBarNotificationInfo {
             } catch (final PackageManager.NameNotFoundException e) {}
             return (String)((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
         } catch (NullPointerException e) {
-            Log.e("Jarvis", "[ERR] Need to open app to create a Context");
+            Logger.e("Jarvis", "[ERR] Need to open app to create a Context");
             return "";
         }
     }
 
     public String getTitle() {
-        return s.getNotification().extras.getString("android.title");
+        try {
+            return s.getNotification().extras.get("android.title").toString();
+        } catch (NullPointerException e) {
+            return "";
+        }
     }
 
     public String getMessage() {
-        return s.getNotification().extras.getString("android.text");
+        try {
+            return s.getNotification().extras.get("android.text").toString();
+        } catch (NullPointerException e) {
+            return "";
+        }
     }
 
     public long getTimeStamp() {
@@ -91,9 +99,9 @@ public class StatusBarNotificationInfo {
         try {
             return Storage.getContext().getPackageManager().getApplicationIcon(s.getPackageName());
         } catch (NullPointerException e) {
-            Log.e("Jarvis", "[ERR] Need to open app to create a Context");
+            Logger.e("Jarvis", "[ERR] Need to open app to create a Context");
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e("Jarvis", "getIconForPackageName2 - " + Log.getStackTraceString(e));
+            Logger.e("Jarvis", "getIconForPackageName2 - " + Log.getStackTraceString(e));
         }
         return null;
     }
@@ -105,9 +113,14 @@ public class StatusBarNotificationInfo {
 
         Drawable drawable = null;
         try {
-            drawable = icon.loadDrawable(getContext());
+            if (Storage.getContext() == null) {
+                Logger.e("Jarvis", "[ERR] Caught, Need to open app to create Context");
+                return null;
+            }
+
+            drawable = icon.loadDrawable(Storage.getContext());
         } catch (NullPointerException e) {
-            Log.e("Jarvis", "[ERR] Need to open app to create a Context");
+            Logger.e("Jarvis", "[ERR] Need to open app to create a Context");
         }
 
         return drawable;

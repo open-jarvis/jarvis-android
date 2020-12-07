@@ -8,6 +8,7 @@ import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
+import com.example.jarvis.utils.Logger;
 import com.example.jarvis.utils.StatusBarNotificationInfo;
 import com.example.jarvis.utils.Storage;
 import com.example.jarvis.utils.Utils;
@@ -18,9 +19,10 @@ import java.util.Set;
 
 public class NotificationService extends NotificationListenerService {
     public static NotificationServiceReceiver notificationServiceReceiver;
+
     @Override
     public void onCreate() {
-        Log.d("Jarvis", "[FUNC] NotificationService::onCreate");
+        Logger.d("Jarvis", "[FUNC] NotificationService::onCreate");
         super.onCreate();
         notificationServiceReceiver = new NotificationServiceReceiver();
         IntentFilter filter = new IntentFilter();
@@ -30,15 +32,14 @@ public class NotificationService extends NotificationListenerService {
 
     @Override
     public void onDestroy() {
-        Log.d("Jarvis", "[FUNC] NotificationService::onDestroy");
+        Logger.d("Jarvis", "[FUNC] NotificationService::onDestroy");
         super.onDestroy();
         unregisterReceiver(notificationServiceReceiver);
     }
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
-        Log.d("Jarvis", "[FUNC] NotificationService::onNotificationPosted - A notification was posted");
-        Storage.setNotifications(notificationServiceReceiver.getNotifications());
+        Jarvis.sendNotifications(notificationServiceReceiver.getNotifications());
 
         Intent i = new Intent(Storage.getNotificationChannel());
         i.putExtra("notification_event","onNotificationPosted :" + sbn.getPackageName() + "\n");
@@ -47,8 +48,7 @@ public class NotificationService extends NotificationListenerService {
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
-        Log.d("Jarvis", "[FUNC] NotificationService::onNotificationRemoved - A notification was removed");
-        Storage.setNotifications(notificationServiceReceiver.getNotifications());
+        Jarvis.sendNotifications(notificationServiceReceiver.getNotifications());
 
         Intent i = new Intent(Storage.getNotificationChannel());
         i.putExtra("notification_event","onNotificationRemoved :" + sbn.getPackageName() + "\n");
@@ -59,7 +59,10 @@ public class NotificationService extends NotificationListenerService {
     public class NotificationServiceReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("Jarvis", "[FUNC] NotificationService.NotificationServiceReceiver::onReceive - " + intent.getStringExtra("command"));
+            if (!Jarvis.isConnected()) { Logger.i("Jarvis", "onReceive : Notifications stopped"); return; }
+            Jarvis.sendNotifications(getNotifications());
+
+            Logger.d("Jarvis", "[FUNC] NotificationService.NotificationServiceReceiver::onReceive - " + intent.getStringExtra("command"));
             if (intent.getStringExtra("command").equals("clearall")) {
                 NotificationService.this.cancelAllNotifications();
             }
@@ -83,11 +86,10 @@ public class NotificationService extends NotificationListenerService {
                 sendBroadcast(i3);
             }
 
-            Storage.setNotifications(getNotifications());
         }
 
         public Set<Map<String, String>> getNotifications() {
-            Log.d("Jarvis", "[FUNC] NotificationService::getNotifications - Getting and saving Notifications");
+            Logger.d("Jarvis", "[FUNC] NotificationService::getNotifications - Getting and saving Notifications");
 
             HashSet<Map<String, String>> result = new HashSet<>();
 

@@ -74,7 +74,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="15dp"
         android:width="300dp"
         android:backgroundTint="@color/main"
         android:ems="10"
@@ -84,7 +84,7 @@
         android:textColorHighlight="@color/main"
         android:textColorLink="@color/main"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ipOrHostname" />
+        app:layout_constraintTop_toBottomOf="@+id/preSharedKeyInput" />
 
     <TextView
         android:id="@+id/textView"
@@ -112,6 +112,34 @@
         app:layout_constraintCircleRadius="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/jarvisToken" />
+
+    <Button
+        android:id="@+id/reconnectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/main"
+        android:backgroundTint="@color/main"
+        android:text="Reconnect"
+        android:textColor="@color/white"
+        app:cornerRadius="7dp"
+        app:layout_constraintCircleRadius="10dp"
+        app:layout_constraintStart_toEndOf="@+id/connectButton"
+        app:layout_constraintTop_toBottomOf="@+id/jarvisToken" />
+
+    <EditText
+        android:id="@+id/preSharedKeyInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="15dp"
+        android:width="300dp"
+        android:ems="10"
+        android:hint="Pre-shared key"
+        android:inputType="textPassword"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ipOrHostname" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
